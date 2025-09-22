@@ -6,7 +6,6 @@ exports.getProperties = async (req, res) => {
     const limit = parseInt(req.query.limit) || 12;
     const skip = (page - 1) * limit;
 
-    // 🔎 Filters
     let filter = {};
 
     if (req.query.location) {
@@ -31,17 +30,15 @@ exports.getProperties = async (req, res) => {
       filter.bathrooms = Number(req.query.bathrooms);
     }
 
-    // 🔃 Sorting
     let sort = {};
     if (req.query.sortBy) {
       const sortField = req.query.sortBy;
       const sortOrder = req.query.order === "desc" ? -1 : 1;
       sort[sortField] = sortOrder;
     } else {
-      sort.createdAt = -1; // default newest first
+      sort.createdAt = -1;
     }
 
-    // 📦 Query DB
     const [properties, total] = await Promise.all([
       Property.find(filter).sort(sort).skip(skip).limit(limit),
       Property.countDocuments(filter),
