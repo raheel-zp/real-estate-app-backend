@@ -13,6 +13,12 @@ app.use("/api/properties", propertiesRouter);
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
+const favoritesRouter = require("./routes/favorites");
+app.use("/api/favorites", favoritesRouter);
+
+const inquiryRoutes = require("./routes/inquiryRoutes");
+app.use("/api/inquiries", inquiryRoutes);
+
 const PORT = process.env.PORT || 5000;
 connectMongo().then(() => {
   app.listen(PORT, () => {
