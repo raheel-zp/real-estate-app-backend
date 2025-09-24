@@ -17,8 +17,16 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -34,5 +42,13 @@ app.use("/api/favorites", favoritesRouter);
 app.use("/api/inquiries", inquiryRoutes);
 
 const PORT = process.env.PORT || 5000;
-connectMongo();
-module.exports = app;
+if (process.env.NODE_ENV === "development") {
+  connectMongo().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server listening on ${PORT}`);
+    });
+  });
+} else {
+  connectMongo();
+  module.exports = app;
+}
