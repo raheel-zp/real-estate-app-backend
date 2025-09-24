@@ -5,6 +5,9 @@ const path = require("path");
 dotenv.config();
 const { connectMongo } = require("./config/db");
 const propertiesRouter = require("./routes/properties");
+const authRoutes = require("./routes/authRoutes");
+const favoritesRouter = require("./routes/favorites");
+const inquiryRoutes = require("./routes/inquiryRoutes");
 
 const app = express();
 const allowedOrigins = [
@@ -23,16 +26,11 @@ app.options("*", cors());
 
 app.use(express.json());
 
-//app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 app.use("/api/properties", propertiesRouter);
-const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
-
-const favoritesRouter = require("./routes/favorites");
 app.use("/api/favorites", favoritesRouter);
-
-const inquiryRoutes = require("./routes/inquiryRoutes");
 app.use("/api/inquiries", inquiryRoutes);
 
 const PORT = process.env.PORT || 5000;
