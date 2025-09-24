@@ -34,8 +34,5 @@ app.use("/api/favorites", favoritesRouter);
 app.use("/api/inquiries", inquiryRoutes);
 
 const PORT = process.env.PORT || 5000;
-connectMongo().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`);
-  });
-});
+connectMongo();
+module.exports = app;
