@@ -1,4 +1,5 @@
 const Property = require("../models/Property");
+const { v4: uuidv4 } = require("uuid");
 
 exports.getProperties = async (req, res) => {
   try {
@@ -67,43 +68,70 @@ exports.getPropertyById = async (req, res) => {
 
 exports.createProperty = async (req, res) => {
   try {
-    const property = new Property(req.body);
+    const { title, description, price, location } = req.body;
+
+    const imagePaths = req.files
+      ? req.files.map(
+          (file) =>
+            `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
+        )
+      : [];
+    const mysqlId = uuidv4();
+
+    const property = new Property({
+      mysqlId,
+      title,
+      description,
+      price,
+      location,
+      images: imagePaths,
+      createdBy: req.user.id,
+    });
+
     await property.save();
-    res
-      .status(201)
-      .json({ message: "Property created successfully", data: property });
+    res.status(201).json(property);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error creating property", error: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.updateProperty = async (req, res) => {
   try {
-    const property = await Property.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const property = await Property.findById(req.params.id);
     if (!property)
       return res.status(404).json({ message: "Property not found" });
-    res.json({ message: "Property updated", data: property });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error updating property", error: error.message });
+
+    let images = property.images;
+    if (req.files && req.files.length > 0) {
+      images = req.files.map(
+        (file) =>
+          `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
+      );
+    }
+    console.log(req.body);
+    property.title = req.body.title || property.title;
+    property.description = req.body.description || property.description;
+    property.price = req.body.price || property.price;
+    property.location = req.body.location || property.location;
+    property.images = images;
+
+    await property.save();
+    res.json(property);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.deleteProperty = async (req, res) => {
   try {
-    const property = await Property.findByIdAndDelete(req.params.id);
+    const property = await Property.findById(req.params.id);
     if (!property)
       return res.status(404).json({ message: "Property not found" });
-    res.json({ message: "Property deleted" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting property", error: error.message });
+
+    await Property.findByIdAndDelete(req.params.id);
+    res.json({ message: "Property deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 };
