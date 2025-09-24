@@ -7,7 +7,20 @@ const { connectMongo } = require("./config/db");
 const propertiesRouter = require("./routes/properties");
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  "https://real-estate-app-frontend-chi.vercel.app",
+  "http://localhost:5173",
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
+app.options("*", cors());
+
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
