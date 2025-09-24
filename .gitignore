@@ -55,5 +55,3 @@ vite.config.ts.timestamp*
 
 # Other package managers
 .pnpm/
-package-lock.json
-yarn.lock

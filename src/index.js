@@ -23,7 +23,7 @@ app.options("*", cors());
 
 app.use(express.json());
 
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+//app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 app.use("/api/properties", propertiesRouter);
 const authRoutes = require("./routes/authRoutes");
