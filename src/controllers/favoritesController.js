@@ -3,6 +3,7 @@ const User = require("../models/User");
 exports.getFavorites = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate("favorites");
+    console.log(req.user.id);
     res.json(user.favorites);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -12,6 +13,7 @@ exports.getFavorites = async (req, res) => {
 exports.addFavorite = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+
     if (!user.favorites.includes(req.params.propertyId)) {
       user.favorites.push(req.params.propertyId);
       await user.save();
